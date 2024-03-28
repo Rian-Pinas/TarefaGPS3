@@ -64,6 +64,7 @@ public class LocationService {
             } finally {
                 lock.unlock();
             }
+            
         }
         return null;
     }
