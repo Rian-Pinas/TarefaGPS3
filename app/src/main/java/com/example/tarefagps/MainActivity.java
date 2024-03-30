@@ -39,12 +39,13 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding; //Binding para realizar a relação entre a IU com o código
     private LocationCallback locationCallback;
     private LocationRequest locationRequest;
-    private FirebaseFirestore bd = FirebaseFirestore.getInstance(); //Banco de Dados Firestore
+    private FirebaseFirestore bd; //Banco de Dados Firestore
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) { //Método onCreate: usado ao se iniciar o aplicativo
         super.onCreate(savedInstanceState);
+        FirebaseApp.initializeApp(this);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationService = new LocationService();
         binding = ActivityMainBinding.inflate(getLayoutInflater());
