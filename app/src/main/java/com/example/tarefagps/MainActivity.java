@@ -13,6 +13,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.avancada.Region;
 import com.example.tarefagps.databinding.ActivityMainBinding;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -20,6 +21,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
@@ -36,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding; //Binding para realizar a relação entre a IU com o código
     private LocationCallback locationCallback;
     private LocationRequest locationRequest;
+    private FirebaseFirestore bd = FirebaseFirestore.getInstance(); //Banco de Dados Firestore
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) { //Método onCreate: usado ao se iniciar o aplicativo
@@ -115,6 +120,12 @@ public class MainActivity extends AppCompatActivity {
             if (lastLocation != null) {
                 locationService.enqueue(lastLocation);
             }
+        });
+
+        binding.btnGravar.setOnClickListener(v -> {
+            Region regiao = locationService.dequeue();
+            bd.collection("Regiões").document("Posições")
+                    .set(regiao.toMap());
         });
     }
 

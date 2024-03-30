@@ -49,6 +49,9 @@ dependencies {
     //Dependencia do mapa utilizado no projeto
     implementation libs.osmdroid.android
 
-    //Link entre a biblioteca e o App
+    //Link entre a biblioteca criada e o App
     implementation project(':Avancada')
+
+    //Dependencia do banco de dados Firestore
+    implementation 'com.google.firebase:firebase-firestore:24.8.1'
 }

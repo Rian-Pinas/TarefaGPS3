@@ -49,6 +49,14 @@
             android:layout_marginEnd="12dp"
             android:text="Enfileirar"/>
 
+        <Button
+            android:id="@+id/btn_gravar"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:background="#c1c1c1"
+            android:layout_marginEnd="12dp"
+            android:text="Gravar no BD"/>
+
     </LinearLayout>
 
 </LinearLayout>

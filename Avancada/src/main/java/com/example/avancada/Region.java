@@ -1,5 +1,7 @@
 package com.example.avancada;
 
+import java.util.HashMap;
+
 public class Region {
     private String name;
     private double latitude;
@@ -15,11 +17,20 @@ public class Region {
     }
 
     public double getLatitude(){
+
         return this.latitude;
     }
 
     public double getLongitude(){
+
         return this.longitude;
+    }
+
+    public HashMap<String,Double> toMap(){
+        HashMap<String, Double> mapa = new HashMap<>();
+        mapa.put("Latitude", this.getLatitude());
+        mapa.put("Longitude", this.getLongitude());
+        return mapa;
     }
 
 
