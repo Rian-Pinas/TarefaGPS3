@@ -16,16 +16,19 @@ import com.google.android.gms.tasks.CancellationToken;
 import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.OnTokenCanceledListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.AggregateQuerySnapshot;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class LocationService {
@@ -36,58 +39,86 @@ public class LocationService {
 
     public void enqueue(Location item){
         Region regiao = new Region ("Região "+contador, item.getLatitude(), item.getLongitude(), 0);
-        if (checaDistancia(regiao)){
-            new Thread(() -> { //Thread que enfilera as regiões
-                try {
-                    lock.lock(); //Trava do semáforo
-                    queue.add(regiao);
-                    contador++;
-                    Log.d("Fila", "Sucesso ao adicionar à fila.");
-                } finally {
-                    lock.unlock(); //Destravamento do semáforo
-                }
-            }).start();
-        } else {
-            Log.d("Fila","Falha ao adicionar à fila.");
-        }
-    }
+        AtomicBoolean boolFila = new AtomicBoolean(false);
+        AtomicBoolean boolBancoD = new AtomicBoolean(false);
 
-    private boolean checaDistancia(Region r1){
-        LinkedList<Region> lista = (LinkedList<Region>)queue; //Conversão inversa do tipo da fila para acesso
-        for(int i=0; i<lista.size(); i++){
-            if (!Utility.permitirAddFila(r1,lista.get(i))){ //Percorre a lista até o primeiro impedimento do boolean
-                return false;
+        Thread verFila = canAddFila(regiao, boolFila);
+        Thread verBD = canAddBD(regiao, boolBancoD);
+
+        new Thread(() -> {
+            try {
+                verBD.start();
+                verFila.start();
+                verBD.join();
+                verFila.join();
+
+                if(boolFila.get() && boolBancoD.get()) {
+                    if (lock.tryLock()){
+                        queue.add(regiao);
+                        lock.unlock();
+                        Log.d("Teste", "Lock está fechado.");
+                        contador++;
+                        Log.d("Teste", "Sucesso ao adicionar à fila.");
+                    }
+                } else {
+                    Log.d("Teste", "Não foi possível adicionar.");
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
-        } // Caso não haja região dentro dos 30 metros, ela será adicionada.
-        return true;
+        }).start();
     }
 
-    private boolean checaDistBD(Region r1) {
-        bd.collection("suaColecao").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                QuerySnapshot querySnapshot = task.getResult();
-                for (DocumentSnapshot document : querySnapshot) {
-
+    private Thread canAddBD (Region r1, AtomicBoolean canAdd) {
+        return new Thread(() ->{
+            Log.d("Teste", "Iniciando canAddBD");
+            Task<QuerySnapshot> task = bd.collection("Regiões").get();
+            canAdd.set(true);
+            try {
+                while (!(task.isComplete() || task.isCanceled()));
+                if (task.isSuccessful()) {
+                    Log.d("Teste", "Sucesso encontrando Documentos");
+                    if (!task.getResult().isEmpty()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Log.d("Teste", "Lendo documentos do banco de dados...");
+                            Region region = new Region(document.getData());
+                            if (!Utility.permitirAddFila(region, r1)) {
+                                canAdd.set(false);
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    Log.d("Teste", "Erro ao encontrar documentos", task.getException());
                 }
-            } else {
-                // Trate o erro
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         });
-        return true;
+    }
+
+    private Thread canAddFila(Region r1, AtomicBoolean canAdd) {
+        return new Thread(() -> {
+            Log.d("Teste", "Iniciando canAddFila");
+            canAdd.set(true);
+            LinkedList<Region> list = (LinkedList<Region>) queue;
+            for (Region r : list) {
+                Log.d("Teste", "Lendo Lista de Região");
+                if (!Utility.permitirAddFila(r1, r)) {
+                    Log.d("Teste", "Não permite adicionar");
+                    canAdd.set(false);
+                }
+            }
+        });
     }
 
     public Region dequeue() {
-        Region aux = null;
-        if (lock.tryLock()) { //Se o semáforo ja está travado, será falso.
-            try {
-                lock.lock();
-                aux = queue.remove();
-            } catch (NoSuchElementException e) {
-                Log.e("QUEUE EXCEPTION", "Deu erro aqui filhote");
-            } finally {
-                lock.unlock();
-            }
+        Region region = null;
+        if (lock.tryLock()) {
+            region = queue.poll();
+            lock.unlock();
+            Log.d("Teste", "Lock está aberto.");
         }
-        return aux;
+        return region;
     }
 }

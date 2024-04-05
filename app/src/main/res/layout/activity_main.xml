@@ -47,7 +47,7 @@
             android:layout_height="60dp"
             android:background="#c1c1c1"
             android:layout_marginEnd="12dp"
-            android:text="Enfileirar"/>
+            android:text="Adicionar Região"/>
 
         <Button
             android:id="@+id/btn_gravar"

@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
             Region regiao = locationService.dequeue();
             if (regiao != null){
                 bd.collection("Regiões").document(regiao.getName())
-                        .set(regiao.toMap());
+                        .set(regiao);
             }
         });
     }
