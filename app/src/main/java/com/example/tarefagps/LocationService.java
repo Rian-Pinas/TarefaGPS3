@@ -16,6 +16,11 @@ import com.google.android.gms.tasks.CancellationToken;
 import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.OnTokenCanceledListener;
+import com.google.firebase.firestore.AggregateQuerySnapshot;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -26,14 +31,17 @@ import java.util.concurrent.locks.ReentrantLock;
 public class LocationService {
     ReentrantLock lock = new ReentrantLock();
     private final Queue<Region> queue = new LinkedList<>();
+    private int contador = 0;
+    private FirebaseFirestore bd = FirebaseFirestore.getInstance();
 
     public void enqueue(Location item){
-        Region regiao = new Region ("", item.getLatitude(), item.getLongitude(), 0);
+        Region regiao = new Region ("Região "+contador, item.getLatitude(), item.getLongitude(), 0);
         if (checaDistancia(regiao)){
             new Thread(() -> { //Thread que enfilera as regiões
                 try {
                     lock.lock(); //Trava do semáforo
                     queue.add(regiao);
+                    contador++;
                     Log.d("Fila", "Sucesso ao adicionar à fila.");
                 } finally {
                     lock.unlock(); //Destravamento do semáforo
@@ -54,18 +62,32 @@ public class LocationService {
         return true;
     }
 
+    private boolean checaDistBD(Region r1) {
+        bd.collection("suaColecao").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot querySnapshot = task.getResult();
+                for (DocumentSnapshot document : querySnapshot) {
+
+                }
+            } else {
+                // Trate o erro
+            }
+        });
+        return true;
+    }
+
     public Region dequeue() {
+        Region aux = null;
         if (lock.tryLock()) { //Se o semáforo ja está travado, será falso.
             try {
                 lock.lock();
-                return queue.remove();
+                aux = queue.remove();
             } catch (NoSuchElementException e) {
-                Log.e("QUEUE EXCEPTION", Objects.requireNonNull(e.getMessage()));
+                Log.e("QUEUE EXCEPTION", "Deu erro aqui filhote");
             } finally {
                 lock.unlock();
             }
-            
         }
-        return null;
+        return aux;
     }
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "497094784478",
+    "project_id": "tarefagps",
+    "storage_bucket": "tarefagps.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:497094784478:android:f4ec786807c4426493994f",
+        "android_client_info": {
+          "package_name": "com.example.tarefagps"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVJN5iAruaUBGgZ9lS0iGYpUsD31wg2qY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

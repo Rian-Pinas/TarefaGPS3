@@ -1,7 +1,5 @@
 package com.example.tarefagps;
 
-import static androidx.core.location.LocationManagerCompat.requestLocationUpdates;
-
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -21,7 +19,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.osmdroid.api.IMapController;
@@ -39,13 +36,12 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding; //Binding para realizar a relação entre a IU com o código
     private LocationCallback locationCallback;
     private LocationRequest locationRequest;
-    private FirebaseFirestore bd; //Banco de Dados Firestore
+    private FirebaseFirestore bd = FirebaseFirestore.getInstance(); //Banco de Dados Firestore
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) { //Método onCreate: usado ao se iniciar o aplicativo
         super.onCreate(savedInstanceState);
-        FirebaseApp.initializeApp(this);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationService = new LocationService();
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -125,8 +121,10 @@ public class MainActivity extends AppCompatActivity {
 
         binding.btnGravar.setOnClickListener(v -> {
             Region regiao = locationService.dequeue();
-            bd.collection("Regiões").document("Posições")
-                    .set(regiao.toMap());
+            if (regiao != null){
+                bd.collection("Regiões").document(regiao.getName())
+                        .set(regiao.toMap());
+            }
         });
     }
 

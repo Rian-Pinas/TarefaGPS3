@@ -17,13 +17,15 @@ public class Region {
     }
 
     public double getLatitude(){
-
         return this.latitude;
     }
 
     public double getLongitude(){
-
         return this.longitude;
+    }
+
+    public String getName(){
+        return this.name;
     }
 
     public HashMap<String,Double> toMap(){

@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.androidApplication)
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -53,5 +54,9 @@ dependencies {
     implementation project(':Avancada')
 
     //Dependencia do banco de dados Firestore
-    implementation 'com.google.firebase:firebase-firestore:24.8.1'
+    implementation libs.firebase.firestore
+    implementation libs.firebase.core
+
+    implementation libs.firebase.bom
+    implementation 'com.google.firebase:firebase-analytics'
 }
