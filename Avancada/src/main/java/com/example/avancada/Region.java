@@ -2,8 +2,8 @@ package com.example.avancada;
 
 import android.location.Location;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Region {
     protected String name;
@@ -20,13 +20,14 @@ public class Region {
         this.timestamp = System.nanoTime();
     }
 
-    // Construtor que recebe os valores lidos do banco de dados
-    public Region (Map<String, Object> map){
-        this.name = (String) map.get("name");
-        this.latitude = (double) map.get("latitude");
-        this.longitude = (double) map.get("longitude");
-        this.user = Math.toIntExact((long)map.get("user"));
-        this.timestamp = (long) map.get("timestamp");
+    //Construtor que recebe os valores lidos do banco de dados em Json
+    @JsonCreator
+    public Region (@JsonProperty("name") String nome, @JsonProperty("latitude")double lat, @JsonProperty("longitude")double lon, @JsonProperty("timestamp") long timestamp, @JsonProperty("user")int user){
+        this.name = nome;
+        this.latitude = lat;
+        this.longitude = lon;
+        this.user = user;
+        this.timestamp = timestamp;
     }
 
     //Método para calcular a distância entre duas Regiões (sendo menor que 30)
@@ -37,6 +38,7 @@ public class Region {
         return result[0];
     }
 
+    //Permissão para adicionar à fila
     public boolean permitirAddFila(Region r2) {
         return distance (r2) >= 30;
     }

@@ -1,14 +1,41 @@
 package com.example.avancada;
 
-import android.location.Location;
+import android.util.Log;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Utility {
 
-    //Método para calcular a distância entre duas Regiões (sendo menor que 30)
-    /*public static boolean permitirAddFila(Region r1, Region r2){
-        float[] result = new float[1]; //os indíces do resultado podem ser 1, 2 ou 3,
-                                       //sendo 1 o esperado para retornar a distância.
-        Location.distanceBetween(r1.getLatitude(), r1.getLongitude(), r2.getLatitude(), r2.getLongitude(), result);
-        return result[0]>30;
-    }*/
+    //Método que chama o tipo de Região (Region, SubRegion, RestrictedRegion) para ser convertida.
+    public static Region jsonToObject (String json) {
+        if (json.contains("regionFather") && json.contains("restricted")) {
+            //Se for uma região restrita:
+            return convertJsonToObject(json, RestrictedRegion.class);
+        } else if (json.contains("regionFather") && !json.contains("restricted")) {
+            //Se for uma sub região:
+            return convertJsonToObject(json, SubRegion.class);
+        }
+        //Se for uma Região:
+        return convertJsonToObject(json, Region.class);
+    }
+
+    //Método que converte um Objeto para Json
+    public static String convertObjectToJson(Object object) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(object);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    //Método que converte a string Json para um Objeto passado por parâmetro (Nesse caso, Region, SubRegion ou RestrictedRegion)
+    private static <T> T convertJsonToObject(String jsonString, Class<T> valueType) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readValue(jsonString, valueType);
+        } catch (Exception e) {
+            Log.d("Teste", e.getMessage());
+            return null;
+        }
+    }
 }

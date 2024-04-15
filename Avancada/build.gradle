@@ -33,4 +33,7 @@ dependencies {
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
 
+    //Dependencia da Criptografia e conversão Json
+    implementation libs.security.crypto
+    implementation libs.jackson.databind
 }

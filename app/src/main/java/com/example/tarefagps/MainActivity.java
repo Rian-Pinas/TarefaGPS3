@@ -5,13 +5,13 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.example.avancada.Region;
 import com.example.tarefagps.databinding.ActivityMainBinding;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -27,6 +27,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Marker;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -120,10 +121,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         binding.btnGravar.setOnClickListener(v -> {
-            Region regiao = locationService.dequeue();
+            String regiao = locationService.dequeue();
             if (regiao != null){
-                bd.collection("Regiões").document(regiao.getName())
-                        .set(regiao);
+                HashMap<String, String> map = new HashMap<>(); //O mapa de String agora faz referência ao Json criptografado
+                map.put("Regiao",regiao);
+                bd.collection("Regiões").add(map);
             }
         });
     }

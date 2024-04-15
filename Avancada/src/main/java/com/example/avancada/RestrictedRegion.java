@@ -1,8 +1,7 @@
 package com.example.avancada;
 
-import android.location.Location;
-
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class RestrictedRegion extends Region {
     private Region mainRegion;
@@ -13,9 +12,11 @@ public class RestrictedRegion extends Region {
         this.restricted = restricted;
     }
 
-    public RestrictedRegion(Map<String, Object> map, Region mainRegion, boolean restricted) {
-        super(map);
-        this.mainRegion = mainRegion;
+    //Construtor que recebe os valores lidos do banco de dados em Json
+    @JsonCreator
+    public RestrictedRegion (@JsonProperty("name") String nome, @JsonProperty("latitude")double lat, @JsonProperty("longitude")double lon, @JsonProperty("timestamp") long timestamp, @JsonProperty("user")int user, @JsonProperty("regionFather")String mainRegion, @JsonProperty("retricted")boolean restricted){
+        super(nome, lat, lon, timestamp, user);
+        this.mainRegion = null;
         this.restricted = restricted;
     }
 
