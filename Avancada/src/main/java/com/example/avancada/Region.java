@@ -1,14 +1,16 @@
 package com.example.avancada;
 
+import android.location.Location;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class Region {
-    private String name;
-    private double latitude;
-    private double longitude;
-    private int user;
-    private long timestamp;
+    protected String name;
+    protected double latitude;
+    protected double longitude;
+    protected int user;
+    protected long timestamp;
 
     public Region (String nome, double lat, double lon, int user){
         this.name = nome;
@@ -25,6 +27,18 @@ public class Region {
         this.longitude = (double) map.get("longitude");
         this.user = Math.toIntExact((long)map.get("user"));
         this.timestamp = (long) map.get("timestamp");
+    }
+
+    //Método para calcular a distância entre duas Regiões (sendo menor que 30)
+    public double distance(Region r2){
+        float[] result = new float[1]; //os indíces do resultado podem ser 1, 2 ou 3,
+        //sendo 1 o esperado para retornar a distância.
+        Location.distanceBetween(this.getLatitude(), this.getLongitude(), r2.getLatitude(), r2.getLongitude(), result);
+        return result[0];
+    }
+
+    public boolean permitirAddFila(Region r2) {
+        return distance (r2) >= 30;
     }
 
     public double getLatitude(){

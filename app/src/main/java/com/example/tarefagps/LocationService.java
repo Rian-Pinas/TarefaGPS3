@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
 import com.example.avancada.Region;
+import com.example.avancada.RestrictedRegion;
+import com.example.avancada.SubRegion;
 import com.example.avancada.Utility;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Priority;
@@ -29,6 +31,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class LocationService {
@@ -36,13 +39,15 @@ public class LocationService {
     private final Queue<Region> queue = new LinkedList<>();
     private int contador = 0;
     private FirebaseFirestore bd = FirebaseFirestore.getInstance();
+    private boolean subRest = false;
 
     public void enqueue(Location item){
         Region regiao = new Region ("Região "+contador, item.getLatitude(), item.getLongitude(), 0);
         AtomicBoolean boolFila = new AtomicBoolean(false);
+        AtomicReference<Region> mainRegion = new AtomicReference<>(null);
         AtomicBoolean boolBancoD = new AtomicBoolean(false);
 
-        Thread verFila = canAddFila(regiao, boolFila);
+        Thread verFila = canAddFila(regiao, boolFila, mainRegion);
         Thread verBD = canAddBD(regiao, boolBancoD);
 
         new Thread(() -> {
@@ -53,10 +58,21 @@ public class LocationService {
                 verFila.join();
 
                 if(boolFila.get() && boolBancoD.get()) {
+                    Region novaRegiao = new Region("Região " + contador, item.getLatitude(), item.getLongitude(), 0);
+                    if (mainRegion.get() != null) {
+                        if (subRest) {
+                            novaRegiao = new RestrictedRegion("Região "+contador, item.getLatitude(), item.getLongitude(), 0, mainRegion.get(), true);
+                            Log.d("Teste", "Adicionada Região Restrita");
+                        } else {
+                            novaRegiao = new SubRegion("Região "+contador, item.getLatitude(), item.getLongitude(), 0, mainRegion.get());
+                            Log.d("Teste", "Adicionada Sub-Região");
+                        }
+                        subRest = !subRest;
+                    }
+
                     if (lock.tryLock()){
-                        queue.add(regiao);
+                        queue.add(novaRegiao);
                         lock.unlock();
-                        Log.d("Teste", "Lock está fechado.");
                         contador++;
                         Log.d("Teste", "Sucesso ao adicionar à fila.");
                     }
@@ -82,7 +98,14 @@ public class LocationService {
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             Log.d("Teste", "Lendo documentos do banco de dados...");
                             Region region = new Region(document.getData());
-                            if (!Utility.permitirAddFila(region, r1)) {
+                            if (document.contains("regionFather") && document.contains("restricted")) {
+                                //Se for uma região restrita: (o valor da mainRegion não é interessante nesse momento)
+                                region = new RestrictedRegion(document.getData(), null, (boolean)document.get("restricted"));
+                            } else if (document.contains("regionFather") && !document.contains("restricted")) {
+                                //Se for uma sub região: (o valor da mainRegion não é interessante nesse momento)
+                                region = new SubRegion(document.getData(), null);
+                            }
+                            if (!region.permitirAddFila(r1)) {
                                 canAdd.set(false);
                                 break;
                             }
@@ -97,16 +120,22 @@ public class LocationService {
         });
     }
 
-    private Thread canAddFila(Region r1, AtomicBoolean canAdd) {
+    private Thread canAddFila(Region r1, AtomicBoolean canAdd, AtomicReference<Region> mainRegion) {
         return new Thread(() -> {
             Log.d("Teste", "Iniciando canAddFila");
             canAdd.set(true);
             LinkedList<Region> list = (LinkedList<Region>) queue;
             for (Region r : list) {
                 Log.d("Teste", "Lendo Lista de Região");
-                if (!Utility.permitirAddFila(r1, r)) {
-                    Log.d("Teste", "Não permite adicionar");
-                    canAdd.set(false);
+                if ((r instanceof SubRegion) || (r instanceof RestrictedRegion)) { // Se é sub ou restricted
+                    if (!r.permitirAddFila(r1)) {
+                        Log.d("Teste", "Não permite adicionar Região");
+                        canAdd.set(false);
+                    }
+                } else {
+                    if (!r.permitirAddFila(r1)) {
+                        mainRegion.set(r);
+                    }
                 }
             }
         });
