@@ -16,6 +16,13 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url = uri("https://maven.pkg.github.com/Rian-Pinas/TarefaGPS3")
+            credentials {
+                username = usuario
+                password = token
+            }
+        }
     }
 }
 

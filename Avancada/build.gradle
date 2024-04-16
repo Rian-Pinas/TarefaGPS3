@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.androidLibrary)
+    id 'maven-publish'
 }
 
 android {
@@ -25,6 +26,29 @@ android {
     }
 }
 
+publishing {
+    publications {
+        bar(MavenPublication) {
+            groupId "com.example"
+            artifactId "avancada"
+            version "1.0"
+
+            artifact("$buildDir/outputs/aar/Avancada-debug.aar")
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GithubPackages"
+            url = uri("https://maven.pkg.github.com/Rian-Pinas/TarefaGPS3")
+            credentials {
+                username = usuario
+                password = token
+            }
+        }
+    }
+}
+
 dependencies {
 
     implementation libs.appcompat
@@ -36,4 +60,7 @@ dependencies {
     //Dependencia da Criptografia e conversão Json
     implementation libs.security.crypto
     implementation libs.jackson.databind
+
+    //Utilização da Biblioteca
+    //implementation 'com.example:avancada:1.0'
 }
