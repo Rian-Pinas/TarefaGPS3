@@ -36,4 +36,7 @@ dependencies {
     //Dependencia da Criptografia e conversão Json
     implementation libs.security.crypto
     implementation libs.jackson.databind
+
+    //Dependencia da biblioteca
+    implementation 'com.github.User:Repo:Tag'
 }
