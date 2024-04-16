@@ -38,5 +38,5 @@ dependencies {
     implementation libs.jackson.databind
 
     //Dependencia da biblioteca
-    implementation 'com.github.User:Repo:Tag'
+    implementation 'com.github.Rian-Pinas:TarefaGPS3:TarefaGPS3'
 }
