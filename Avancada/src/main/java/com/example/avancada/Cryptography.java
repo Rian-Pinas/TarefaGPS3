@@ -37,21 +37,28 @@ public class Cryptography {
 
     //Método no qual é realizada a conversão, seguida da encriptografia e retorna o Json encriptografado.
     public static String encryptRegion(Region region){
+        long tini = System.currentTimeMillis(); //Tarefa 7 - Ci //Tarefa 4
+        String strAux;
         String regConverted = Utility.convertObjectToJson(region);
         Log.d("Teste", regConverted);
         try {
             assert regConverted != null;
-            String aux = encrypt(regConverted);
-            return aux;
+            strAux = encrypt(regConverted);
         } catch (Exception e) {
             Log.d("Teste", e.getMessage());
-            return null;
+            strAux = null;
         }
+
+        long tfin = System.currentTimeMillis(); //Tarefa 7 - Ci // Tarefa 4
+        TimeUtil.addTempo((tfin-tini), 7);
+
+        return strAux;
     }
 
     //Método no qual é realizada a descriptografia, seguida da conversão do Json e retorna o objeto esperado.
     public static Region decryptRegion(String json){
         Region region = null;
+        long tini = System.currentTimeMillis(); //Tarefa 3 - Ci //Tarefa 4
         try {
             String aux = decrypt(json);
             Log.d("Teste", aux);
@@ -59,6 +66,8 @@ public class Cryptography {
         } catch (Exception e) {
             Log.d("Teste", e.getMessage());
         }
+        long tfin = System.currentTimeMillis(); //Tarefa 3 - Ci //Tarefa 4
+        TimeUtil.addTempo((tfin-tini), 3);
         return region;
     }
 

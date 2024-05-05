@@ -7,6 +7,7 @@ import com.example.avancada.Cryptography;
 import com.example.avancada.Region;
 import com.example.avancada.RestrictedRegion;
 import com.example.avancada.SubRegion;
+import com.example.avancada.TimeUtil;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -35,6 +36,7 @@ public class LocationService {
         Thread verBD = canAddBD(regiao, boolBancoD, mainRegion);
 
         new Thread(() -> {
+            long tini = System.currentTimeMillis(); //Tarefa 1 - Ci // Tarefa 4
             try {
                 verBD.start();
                 verFila.start();
@@ -66,16 +68,21 @@ public class LocationService {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+            long tfin = System.currentTimeMillis(); //Tarefa 1 - Ci // Tarefa 4
+            TimeUtil.addTempo((tfin-tini), 1);
         }).start();
     }
 
     private Thread canAddBD (Region r1, AtomicBoolean canAdd, AtomicReference<Region> mainRegion) {
         return new Thread(() ->{
             Log.d("Teste", "Iniciando canAddBD");
+            long tini = System.currentTimeMillis(); //Tarefa 2 - Ci // Tarefa 4
             Task<QuerySnapshot> task = bd.collection("Regiões").get();
             canAdd.set(true);
             try {
                 while (!(task.isComplete() || task.isCanceled()));
+                long tfin = System.currentTimeMillis(); //Tarefa 2 - Ci // Tarefa 4
+                TimeUtil.addTempo((tfin-tini), 2);
                 if (task.isSuccessful()) {
                     Log.d("Teste", "Sucesso encontrando Documentos");
                     if (!task.getResult().isEmpty()) {

@@ -62,5 +62,5 @@ dependencies {
     implementation libs.jackson.databind
 
     //Utilização da Biblioteca
-    //implementation 'com.example:avancada:1.0'
+    implementation 'com.example:avancada:1.0'
 }

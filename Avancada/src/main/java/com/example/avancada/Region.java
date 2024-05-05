@@ -1,4 +1,4 @@
-package com.example.avancada;
+/*package com.example.avancada;
 
 import android.location.Location;
 
@@ -64,3 +64,4 @@ public class Region {
     }
 
 }
+*/

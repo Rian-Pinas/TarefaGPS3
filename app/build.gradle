@@ -60,4 +60,7 @@ dependencies {
     implementation libs.firebase.bom
     implementation 'com.google.firebase:firebase-analytics'
 
+    //Utilização da Biblioteca
+    implementation 'com.example:avancada:1.0'
+
 }

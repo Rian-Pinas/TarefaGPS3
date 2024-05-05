@@ -5,13 +5,13 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.avancada.TimeUtil;
 import com.example.tarefagps.databinding.ActivityMainBinding;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -29,6 +29,8 @@ import org.osmdroid.views.overlay.Marker;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.os.Process;
+
 
 public class MainActivity extends AppCompatActivity {
     private LocationService locationService;
@@ -43,6 +45,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) { //Método onCreate: usado ao se iniciar o aplicativo
         super.onCreate(savedInstanceState);
+
+        //Teste de núcleos
+        setContentView(R.layout.activity_main);
+        // Forçar a aplicação a usar apenas o núcleo 0
+        int coreNumber = 0; // Escolha o núcleo que você deseja usar
+        int mask = 1 << coreNumber; // Cria uma máscara para o núcleo escolhido
+        Process.setThreadPriority(Process.myTid(), mask); // Aplica a máscara ao thread atual
+
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationService = new LocationService();
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -69,10 +80,10 @@ public class MainActivity extends AppCompatActivity {
 
         //Pedido de Permissão ao usuário do aplicativo
         requestPermissionsIfNecessary(new String[]{
-                android.Manifest.permission.ACCESS_FINE_LOCATION,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.INTERNET,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
         });
 
         setListeners();
@@ -107,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         stopLocationUpdates();
         binding.mapView.onPause();
+        TimeUtil.showTime();
     }
 
     private void stopLocationUpdates() {
@@ -121,11 +133,15 @@ public class MainActivity extends AppCompatActivity {
         });
 
         binding.btnGravar.setOnClickListener(v -> {
+            long tini = System.currentTimeMillis(); //Tarefa 5 - Ci //Tarefa 4
             String regiao = locationService.dequeue();
             if (regiao != null){
                 HashMap<String, String> map = new HashMap<>(); //O mapa de String agora faz referência ao Json criptografado
                 map.put("Regiao",regiao);
-                bd.collection("Regiões").add(map);
+                bd.collection("Regiões").add(map).addOnCompleteListener(unused->{
+                    long tfin = System.currentTimeMillis(); //Tarefa 5 - Ci // Tarefa 4
+                    TimeUtil.addTempo((tfin-tini), 5);
+                });
             }
         });
     }
