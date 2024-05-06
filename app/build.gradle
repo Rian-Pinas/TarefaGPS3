@@ -61,6 +61,6 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 
     //Utilização da Biblioteca
-    implementation 'com.example:avancada:1.0'
+    implementation 'com.example:avancada:1.1.1'
 
 }

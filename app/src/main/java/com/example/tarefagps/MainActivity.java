@@ -46,12 +46,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) { //Método onCreate: usado ao se iniciar o aplicativo
         super.onCreate(savedInstanceState);
 
-        //Teste de núcleos
+        /*//Teste de núcleos
         setContentView(R.layout.activity_main);
         // Forçar a aplicação a usar apenas o núcleo 0
         int coreNumber = 0; // Escolha o núcleo que você deseja usar
         int mask = 1 << coreNumber; // Cria uma máscara para o núcleo escolhido
-        Process.setThreadPriority(Process.myTid(), mask); // Aplica a máscara ao thread atual
+        Process.setThreadPriority(Process.myTid(), mask); // Aplica a máscara ao thread atual*/
 
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);

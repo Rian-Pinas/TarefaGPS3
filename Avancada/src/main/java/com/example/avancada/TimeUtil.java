@@ -1,4 +1,4 @@
-package com.example.avancada;
+/*package com.example.avancada;
 
 import android.util.Log;
 
@@ -65,4 +65,4 @@ public class TimeUtil {
         Log.d("Tarefas", "Ci - Tarefa 7: "+String.valueOf(mean(tempoT7)));
         Log.d("Tarefas", "Ci - Tarefa 8: "+String.valueOf(mean(tempoT8)));
     }
-}
+}*/
