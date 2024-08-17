@@ -63,4 +63,7 @@ dependencies {
 
     //Utilização da Biblioteca
     implementation 'com.example:avancada:1.1.1'
+
+    //Reconciliação
+    implementation libs.ejml.all
 }

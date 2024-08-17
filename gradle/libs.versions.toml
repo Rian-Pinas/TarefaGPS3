@@ -1,5 +1,6 @@
 [versions]
 agp = "8.3.0"
+ejmlAll = "0.41"
 firebaseBom = "32.8.0"
 firebaseCore = "20.0.0"
 firebaseFirestore = "24.8.1"
@@ -16,6 +17,7 @@ playServicesLocation = "21.2.0"
 securityCrypto = "1.0.0"
 
 [libraries]
+ejml-all = { module = "org.ejml:ejml-all", version.ref = "ejmlAll" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-core = { module = "com.google.firebase:firebase-core", version.ref = "firebaseCore" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore", version.ref = "firebaseFirestore" }

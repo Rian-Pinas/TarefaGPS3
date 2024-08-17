@@ -11,6 +11,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.avancada.Region;
 import com.example.avancada.TimeUtil;
 import com.example.tarefagps.databinding.ActivityMainBinding;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -28,8 +29,10 @@ import org.osmdroid.views.overlay.Marker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 import android.os.Process;
+import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -40,6 +43,15 @@ public class MainActivity extends AppCompatActivity {
     private LocationCallback locationCallback;
     private LocationRequest locationRequest;
     private FirebaseFirestore bd = FirebaseFirestore.getInstance(); //Banco de Dados Firestore
+
+    private Coletor coletor = new Coletor(
+            new Region("", -21.2538, -45.0061, 0),
+            new Region("", -21.2513, -45.0030, 0),
+            new Region("", -21.2470, -45.0004, 0),
+            new Region("", -21.2416, -44.9972, 0),
+            new Region("", -21.2345, -44.9974, 0),
+            new Region("", -21.2317, -44.9948, 0)
+    );
 
 
     @Override
@@ -71,6 +83,11 @@ public class MainActivity extends AppCompatActivity {
                     lastLocation = locationResult.getLastLocation();
                     setMarker(lastLocation);
                     goToPoint(lastLocation);
+
+                    String mensagem = coletor.LocUpdate(lastLocation.getLatitude(), lastLocation.getLongitude());
+                    if (!Objects.equals(mensagem, "")) {
+                        Toast.makeText(getApplicationContext(),mensagem,Toast.LENGTH_LONG).show();
+                    }
                 }
             }
         };
