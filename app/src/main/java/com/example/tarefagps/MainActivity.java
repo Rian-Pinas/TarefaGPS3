@@ -45,12 +45,12 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore bd = FirebaseFirestore.getInstance(); //Banco de Dados Firestore
 
     private Coletor coletor = new Coletor(
-            new Region("", -21.2538, -45.0061, 0),
+            new Region("", -21.2538, -45.0059, 0),
             new Region("", -21.2513, -45.0030, 0),
             new Region("", -21.2470, -45.0004, 0),
             new Region("", -21.2416, -44.9972, 0),
             new Region("", -21.2345, -44.9974, 0),
-            new Region("", -21.2317, -44.9948, 0)
+            new Region("", -21.2312, -44.9941, 0)
     );
 
 
@@ -87,6 +87,9 @@ public class MainActivity extends AppCompatActivity {
                     String mensagem = coletor.LocUpdate(lastLocation.getLatitude(), lastLocation.getLongitude());
                     if (!Objects.equals(mensagem, "")) {
                         Toast.makeText(getApplicationContext(),mensagem,Toast.LENGTH_LONG).show();
+                    }
+                    if (coletor.getExecucao()==10){
+                        coletor.imprime();
                     }
                 }
             }

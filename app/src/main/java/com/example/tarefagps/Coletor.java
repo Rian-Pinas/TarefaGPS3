@@ -1,5 +1,7 @@
 package com.example.tarefagps;
 
+import android.util.Log;
+
 import com.example.avancada.Region;
 
 public class Coletor {
@@ -23,8 +25,12 @@ public class Coletor {
         String mensagem = "";
 
         if (posicao<6 && execucao<10){
-            if (regioes[posicao].distance(new Region("Regiao", lat, lon, 0)) <= 10){
-                y_time[execucao][posicao] = System.nanoTime() / 1_000_000_000; //tempo em segundos
+            if (regioes[posicao].distance(new Region("Regiao", lat, lon, 0)) <= 30){
+                if (posicao == 0) {
+                    y_time[execucao][posicao] = 0;
+                } else {
+                    y_time[execucao][posicao] = (System.nanoTime() / 1_000_000_000) - y_time[execucao][posicao - 1]; //tempo em segundos
+                }
 
                 mensagem = "Passou pelo ponto " + posicao + " Com o tempo: " + y_time[execucao][posicao] + " segs";
                 posicao++;
@@ -35,6 +41,23 @@ public class Coletor {
             }
         }
         return mensagem;
+    }
+
+    public void imprime() {
+        for (int i = 0; i < y_time.length; i++) {
+            StringBuilder linha = new StringBuilder();
+
+            for (int j = 0; j < y_time[i].length; j++) {
+                linha.append(String.format("%.2f ", y_time[i][j]));
+            }
+
+            // Usa Log.d para imprimir cada linha da matriz no Logcat
+            Log.d("Dados", linha.toString());
+        }
+    }
+
+    public int getExecucao(){
+        return this.execucao;
     }
 
 }
